@@ -1,8 +1,0 @@
-{
-    "ssid":      "Red5",
-    "pass":      "8012254722",
-    "broker":    "192.168.55.200",
-    "subTopic":  "office/rpipicow/commands",
-    "pubTopic":  "office/rpipicow",
-    "client_id": "rpi_pico_w_1"
-}
