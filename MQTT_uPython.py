@@ -58,6 +58,7 @@ if __name__ == "__main__":
   wifi_password = secrets['pass']
   broker = secrets['broker']
   client_id = secrets['client_id']
+  publish_topic = secrets['pubTopic']
 
   mqtt_client = connect_mqtt()
   loop_count = 1
@@ -70,9 +71,10 @@ if __name__ == "__main__":
 
     print( sensor_reading )
     # publish as MQTT payload
-    publish( mqtt_client, 'picow/temperature', temperature )
-    publish( mqtt_client, 'picow/pressure', pressure )
-    publish( mqtt_client, 'picow/humidity', humidity )
+    publish( mqtt_client, f"{publish_topic}/temperature", temperature )
+    publish( mqtt_client, f"{publish_topic}/pressure", pressure )
+    publish( mqtt_client, f"{publish_topic}/humidity", humidity )
     # delay 5 seconds
     loop_count += 3
+    print( network.WLAN.status() )
     utime.sleep( 5 )
