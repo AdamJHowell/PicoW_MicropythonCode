@@ -14,6 +14,7 @@ from time import sleep
 import machine
 import network
 import rp2
+import ubinascii
 import ujson
 import utime
 from machine import Pin, I2C
@@ -221,7 +222,9 @@ if __name__ == "__main__":
     f_altitude = i_altitude * 3.28084
 
     # Print the values to the serial port.
-    print( f"Temperature: {temperature_c:.2f} Degree Celsius" )
+    print( f"Temperature: {temperature_c:.2f} Degrees Celsius" )
+    temp_f = (temperature_c * 1.8) + 32
+    print( f"Temperature: {temp_f:.2f} degrees Fahrenheit" )
     print( f"Pressure: {pressure_hectopascal:.2f} hectopascal (hPa) or millibar (mb)" )
     print( f"Altitude (Hypsometric): {h_altitude:.2f} meters" )
     print( f"Altitude (International Barometric): {i_altitude:.2f} meters" )
