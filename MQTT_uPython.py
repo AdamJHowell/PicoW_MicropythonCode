@@ -47,12 +47,12 @@ def publish( client, topic, value ):
 
 
 if __name__ == "__main__":
-  # Load login data from different file for safety reasons
-  with open( 'privateInfo.json' ) as privateInfo:
-    secrets = ujson.loads( privateInfo.read() )
-
   mac = ubinascii.hexlify( network.WLAN().config( 'mac' ), ':' ).decode()
   print( f"MAC address: {mac}" )
+
+  # Load login data from a file for safety reasons.
+  with open( 'privateInfo.json' ) as privateInfo:
+    secrets = ujson.loads( privateInfo.read() )
 
   wifi_ssid = secrets['ssid']
   wifi_password = secrets['pass']
@@ -60,7 +60,9 @@ if __name__ == "__main__":
   client_id = secrets['client_id']
   publish_topic = secrets['pubTopic']
 
+  setup_wifi( wifi_ssid, wifi_password )
   mqtt_client = connect_mqtt()
+
   loop_count = 1
   while True:
     # Read sensor data

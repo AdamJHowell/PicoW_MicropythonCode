@@ -5,7 +5,31 @@ import time
 import network
 import ubinascii
 import ujson
+import utime
 from machine import Pin
+
+
+def setup_wifi( ssid, password ):
+  wlan = network.WLAN( network.STA_IF )
+  wlan.active( True )
+  wlan.config( pm = 0xa11140 )  # Disable power-save mode
+  wlan.connect( ssid, password )
+
+  max_wait = 10
+  while max_wait > 0:
+    if wlan.status() < 0 or wlan.status() >= 3:
+      break
+  max_wait -= 1
+  print( 'waiting for connection...' )
+  utime.sleep( 1 )
+
+  # Handle connection error
+  if wlan.status() != 3:
+    raise RuntimeError( 'wifi connection failed' )
+  else:
+    print( 'connected' )
+  status = wlan.ifconfig()
+  print( 'ip = ' + status[0] )
 
 
 def set_time():
@@ -28,41 +52,24 @@ def set_time():
 
 
 if __name__ == "__main__":
-  # Load login data from different file for safety reasons
-  with open( 'privateInfo.json' ) as privateInfo:
-    secrets = ujson.loads( privateInfo.read() )
-
   mac = ubinascii.hexlify( network.WLAN().config( 'mac' ), ':' ).decode()
   print( f"MAC address: {mac}" )
+
+  # Load login data from a file for safety reasons.
+  with open( 'privateInfo.json' ) as privateInfo:
+    secrets = ujson.loads( privateInfo.read() )
 
   wifi_ssid = secrets['ssid']
   wifi_password = secrets['pass']
   broker = secrets['broker']
   client_id = secrets['client_id']
+  publish_topic = secrets['pubTopic']
 
   NTP_DELTA = -2208988800
   ntp_host = "pool.ntp.org"
   led = Pin( "LED", Pin.OUT )
 
-  # noinspection PyUnresolvedReferences
-  wlan = network.WLAN( network.STA_IF )
-  wlan.active( True )
-  wlan.connect( wifi_ssid, wifi_password )
-
-  max_wait = 10
-  print( f"Waiting up to {max_wait} seconds for Wi-Fi to connect..." )
-  while max_wait > 0:
-    if wlan.status() < 0 or wlan.status() >= 3:
-      break
-    max_wait -= 1
-    time.sleep( 1 )
-
-  if wlan.status() != 3:
-    raise RuntimeError( "Wi-Fi connection failed" )
-  else:
-    print( "Connected to Wi-Fi" )
-    status = wlan.ifconfig()
-    print( f"IP address: {status[0]}" )
+  setup_wifi( wifi_ssid, wifi_password )
 
   led.on()
   print( f"Local time before: {time.localtime()}" )

@@ -1,4 +1,12 @@
-# https://github.com/dafvid/micropython-bmp280
+"""
+Key features:
+#. Read time from pool.ntp.org and set the system RTC.
+#. Read temperature and pressure from BMP280
+#. Read temperature and humidity from SHT20
+#. Publish telemetry via MQTT
+#. Host a web page with a LED control button and display of current telemetry
+Based on https://github.com/dafvid/micropython-bmp280
+"""
 
 import time
 from time import sleep
@@ -6,8 +14,8 @@ from time import sleep
 import machine
 import network
 import rp2
-import ubinascii
 import ujson
+import utime
 from machine import Pin, I2C
 
 from uPython_BMP280 import BMP280, BMP280_CASE_INDOOR
@@ -22,28 +30,53 @@ with open( 'privateInfo.json' ) as privateInfo:
 # Set country to avoid possible errors / https://randomnerdtutorials.com/micropython-mqtt-esp32-esp8266/
 rp2.country( 'US' )
 
-wlan = network.WLAN( network.STA_IF )
-wlan.active( True )
-# See the MAC address in the wireless chip OTP
-mac = ubinascii.hexlify( network.WLAN().config( 'mac' ), ':' ).decode()
-print( f"MAC address: {mac}" )
+
+def setup_wifi( ssid, password ):
+  wlan = network.WLAN( network.STA_IF )
+  wlan.active( True )
+  wlan.config( pm = 0xa11140 )  # Disable power-save mode
+  wlan.connect( ssid, password )
+
+  max_wait = 10
+  while max_wait > 0:
+    if wlan.status() < 0 or wlan.status() >= 3:
+      break
+  max_wait -= 1
+  print( 'waiting for connection...' )
+  utime.sleep( 1 )
+
+  # Status codes
+  # 0  Link Down
+  # 1  Link Join
+  # 2  Link NoIp
+  # 3  Link Up
+  # -1 Link Fail
+  # -2 Link NoNet
+  # -3 Link BadAuth
+  if wlan.status() != 3:
+    print( f"Wi-Fi error! Connection code: {wlan.status()}" )
+    raise RuntimeError( "Wi-Fi connection failed" )
+  else:
+    for i in range( wlan.status() ):
+      led.on()
+      time.sleep( .1 )
+      led.off()
+    print( "Connected" )
+    status = wlan.ifconfig()
+    print( f"IP address: {status[0]}" )
+
 
 client_id = secrets['client_id']
-ssid = secrets['ssid']
+wifi_ssid = secrets['ssid']
 wifi_password = secrets['pass']
 broker = secrets['broker']
 sub_topic = secrets['subTopic']
 pub_topic = secrets['pubTopic']
+
 last_message = 0
 message_interval = 60
 sensor_temp = machine.ADC( machine.ADC.CORE_TEMP )
 conversion_factor = 3.3 / 65535
-
-if not wlan.isconnected():
-  # Change the line below to match your network ssid, security and password
-  wlan.connect( ssid, wifi_password )
-  while not wlan.isconnected():
-    machine.idle()  # save power while waiting
 
 
 def configure_bmp( bmp280_class_object ):
@@ -55,29 +88,6 @@ def configure_bmp( bmp280_class_object ):
   bmp280_class_object.standby = BMP280_STANDBY_250
   bmp280_class_object.iir = BMP280_IIR_FILTER_2
   print( "BMP Object created and configured.\n" )
-
-
-# Handle connection error
-# Error meanings
-# 0  Link Down
-# 1  Link Join
-# 2  Link NoIp
-# 3  Link Up
-# -1 Link Fail
-# -2 Link NoNet
-# -3 Link BadAuth
-if wlan.status() != 3:
-  print( f"Wi-Fi error! Connection code: {wlan.status()}" )
-  raise RuntimeError( "Wi-Fi connection failed" )
-else:
-  led = machine.Pin( "LED", machine.Pin.OUT )
-  for i in range( wlan.status() ):
-    led.on()
-    time.sleep( .1 )
-    led.off()
-  print( "Connected" )
-  status = wlan.ifconfig()
-  print( f"IP address: {status[0]}" )
 
 
 def subscribe_callback( topic, msg ):
@@ -126,14 +136,30 @@ def ibf_alt_from_hpa( hpa_pressure, pressure_sea_level ):
 
 
 if __name__ == "__main__":
+  mac = ubinascii.hexlify( network.WLAN().config( 'mac' ), ':' ).decode()
+  print( f"MAC address: {mac}" )
+
+  # Load login data from a file for safety reasons.
+  with open( 'privateInfo.json' ) as privateInfo:
+    secrets = ujson.loads( privateInfo.read() )
+
+  wifi_ssid = secrets['ssid']
+  wifi_password = secrets['pass']
+  broker = secrets['broker']
+  client_id = secrets['client_id']
+  publish_topic = secrets['pubTopic']
+
   loop_count = 0
   temp_list = [0, 0, 0]
   pressure_list = [0, 0, 0]
+  led = machine.Pin( "LED", machine.Pin.OUT )
+
+  setup_wifi( wifi_ssid, wifi_password )
 
   # Get Sea Level Pressure from a local airport.  It is indicated by the SLP### reading.
   # Salt Lake City airport: https://e6bx.com/weather/KSLC/
   # Provo airport: https://e6bx.com/weather/KPVU/
-  # ToDo: Get this from an API like ???.
+  # ToDo: Get this from an API like https://api.meteomatics.com/2022-12-30T19:40:00.000-07:00/msl_pressure:hPa/40.2981599,-111.6944313/json?model=mix
   sea_level_pressure = 1015.2  # hPa
 
   # Initiate I2C.  The first argument is an ID.
