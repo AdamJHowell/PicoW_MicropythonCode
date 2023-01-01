@@ -78,5 +78,6 @@ if __name__ == "__main__":
     publish( mqtt_client, f"{publish_topic}/humidity", humidity )
     # delay 5 seconds
     loop_count += 3
-    print( network.WLAN.status() )
+    stringly = f"{network.WLAN.status( network.WLAN( network.STA_IF ) )}"
+    print( stringly )
     utime.sleep( 5 )

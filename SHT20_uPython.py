@@ -9,7 +9,7 @@ def sht20_temperature( i2c_class_object ):
   Return:Temperature
   """
   i2c_class_object.writeto( 0x40, b'\xf3' )  # Write byte “0xf3” to address 0x40, SHT20
-  sleep_ms( 70 )  # SHT20 measurement takes time, must wait
+  sleep_ms( 75 )  # SHT20 measurement takes time, must wait
   temp = i2c_class_object.readfrom( 0x40, 2 )  # Read 2 bytes of data from the x40 address, SHT20
   return -46.86 + 175.72 * (temp[0] * 256 + temp[1]) / 65535  # Perform temperature conversion processing on the read data T=-46.86+175.72*St/2^16
 

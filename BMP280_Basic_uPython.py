@@ -3,6 +3,9 @@ from uPython_BMP280 import BMP280, BMP280_CASE_INDOOR
 from uPython_BMP280 import BMP280_POWER_NORMAL, BMP280_OS_HIGH, BMP280_TEMP_OS_8
 from uPython_BMP280 import BMP280_TEMP_OS_4, BMP280_STANDBY_250, BMP280_IIR_FILTER_2
 import time
+import SHT20_uPython
+from time import sleep_ms
+
 
 def configure_bmp( bmp280_class_object ):
   # Configure the sensor, overriding some "CASE" settings.
@@ -39,7 +42,6 @@ bmp280_object = BMP280( i2c_object, addr = 0x76, use_case = BMP280_CASE_INDOOR )
 configure_bmp( bmp280_object )
 loop_count = 0
 
-
 while True:
   # Read sensors every 10 seconds
   #  Every time a reading occurs, add it to the end of an array.
@@ -61,11 +63,18 @@ while True:
   # Convert the altitude in meters to altitude in feet.
   f_altitude = i_altitude * 3.28084
 
+  sht_temp_c = SHT20_uPython.sht20_temperature( i2c_object )
+  sleep_ms( 50 )  # SHT20 measurement takes time.
+  sht_humidity = SHT20_uPython.sht20_humidity( i2c_object )
+  sleep_ms( 50 )  # SHT20 measurement takes time.
+
   # Print the values to the serial port.
   print( f"Temperature: {temperature_c:.2f} degrees Celsius" )
+  print( f"Temperature: {sht_temp_c:.2f} degrees Celsius" )
   temp_f = (temperature_c * 1.8) + 32
   print( f"Temperature: {temp_f:.2f} degrees Fahrenheit" )
   print( f"Pressure: {pressure_hectopascal:.2f} hectopascal (hPa) or millibar (mb)" )
+  print( f"Humidity: {sht_humidity:.2f} %" )
   print( f"Altitude (Hypsometric): {h_altitude:.2f} meters" )
   print( f"Altitude (International Barometric): {i_altitude:.2f} meters" )
   print( f"Altitude (International Barometric): {f_altitude:.2f} feet" )
