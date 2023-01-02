@@ -31,15 +31,15 @@ def configure_bmp( bmp280_class_object ):
 
 
 # Hypsometric function for calculation altitude from pressure and temperature values.
-def alt_from_pt( hyp_pressure_hpa, temperature, pressure_sea_level ):
-  pressure_ratio = pressure_sea_level / hyp_pressure_hpa
+def hyp_alt_from_pt( pressure_hpa, temperature, sea_level_pressure_hpa ):
+  pressure_ratio = sea_level_pressure_hpa / pressure_hpa
   hypsometric = (((pressure_ratio ** (1 / 5.257)) - 1) * temperature) / 0.0065
   return hypsometric
 
 
 # Altitude from international barometric formula, given in BMP 180 datasheet.
-def ibf_alt_from_hpa( hpa_pressure, pressure_sea_level ):
-  pressure_ratio = hpa_pressure / pressure_sea_level
+def ibf_alt_from_hpa( pressure_hpa, sea_level_pressure_hpa ):
+  pressure_ratio = pressure_hpa / sea_level_pressure_hpa
   return 44330 * (1 - (pressure_ratio ** (1 / 5.255)))
 
 
@@ -57,6 +57,7 @@ if __name__ == "__main__":
   # Initiate I2C.  The first argument is an ID.
   i2c_object = I2C( 0, scl = Pin( 9 ), sda = Pin( 8 ), freq = 1000000 )
 
+  # This has a positive effect on the stability of I2C operations.
   address_list = i2c_object.scan()
   print( f"Addresses: {address_list}" )
 
@@ -97,7 +98,7 @@ if __name__ == "__main__":
       print( f"CPU: {((cpu_temperature * 1.8) + 32):.2f} degrees Fahrenheit" )
 
       # Convert pressure and temperature to altitude using the HYPSOMETRIC formula.
-      h_altitude = alt_from_pt( bmp280_pres_hpa, bmp280_temp_c + 273.15, sea_level_pressure )
+      h_altitude = hyp_alt_from_pt( bmp280_pres_hpa, bmp280_temp_c + 273.15, sea_level_pressure )
       h_altitude_feet = h_altitude * 3.28084
 
       # Convert pressure to altitude using the International Barometric Formula.
