@@ -5,31 +5,9 @@ import time
 import network
 import ubinascii
 import ujson
-import utime
 from machine import Pin
 
-
-def setup_wifi( ssid, password ):
-  wlan = network.WLAN( network.STA_IF )
-  wlan.active( True )
-  wlan.config( pm = 0xa11140 )  # Disable power-save mode
-  wlan.connect( ssid, password )
-
-  max_wait = 10
-  while max_wait > 0:
-    if wlan.status() < 0 or wlan.status() >= 3:
-      break
-  max_wait -= 1
-  print( 'waiting for connection...' )
-  utime.sleep( 1 )
-
-  # Handle connection error
-  if wlan.status() != 3:
-    raise RuntimeError( 'wifi connection failed' )
-  else:
-    print( 'connected' )
-  status = wlan.ifconfig()
-  print( 'ip = ' + status[0] )
+import PicoW_WiFi
 
 
 def set_time():
@@ -69,7 +47,7 @@ if __name__ == "__main__":
   ntp_host = "pool.ntp.org"
   led = Pin( "LED", Pin.OUT )
 
-  setup_wifi( wifi_ssid, wifi_password )
+  PicoW_WiFi.setup_wifi( wifi_ssid, wifi_password )
 
   led.on()
   print( f"Local time before: {time.localtime()}" )

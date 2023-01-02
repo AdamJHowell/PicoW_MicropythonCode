@@ -1,10 +1,12 @@
+import time
+from time import sleep_ms
+
 from machine import Pin, I2C
+
 from bmp280.BMP280_uPython_Library import BMP280, BMP280_CASE_INDOOR
 from bmp280.BMP280_uPython_Library import BMP280_POWER_NORMAL, BMP280_OS_HIGH, BMP280_TEMP_OS_8
 from bmp280.BMP280_uPython_Library import BMP280_TEMP_OS_4, BMP280_STANDBY_250, BMP280_IIR_FILTER_2
-import time
-from sht20 import SHT20_uPython_Library
-from time import sleep_ms
+from sht20.SHT20_uPython_Library import sht20_temperature, sht20_humidity
 
 
 def configure_bmp( bmp280_class_object ):
@@ -63,9 +65,9 @@ while True:
   # Convert the altitude in meters to altitude in feet.
   f_altitude = i_altitude * 3.28084
 
-  sht_temp_c = SHT20_uPython.sht20_temperature( i2c_object )
+  sht_temp_c = sht20_temperature( i2c_object )
   sleep_ms( 50 )  # SHT20 measurement takes time.
-  sht_humidity = SHT20_uPython.sht20_humidity( i2c_object )
+  sht_humidity = sht20_humidity( i2c_object )
   sleep_ms( 50 )  # SHT20 measurement takes time.
 
   # Print the values to the serial port.

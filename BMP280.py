@@ -13,66 +13,15 @@ from time import sleep
 
 import machine
 import network
-import rp2
 import ubinascii
 import ujson
-import utime
 from machine import Pin, I2C
 
+import PicoW_WiFi
 from bmp280.BMP280_uPython_Library import BMP280, BMP280_CASE_INDOOR
 from bmp280.BMP280_uPython_Library import BMP280_POWER_NORMAL, BMP280_OS_HIGH, BMP280_TEMP_OS_8
 from bmp280.BMP280_uPython_Library import BMP280_TEMP_OS_4, BMP280_STANDBY_250, BMP280_IIR_FILTER_2
 from umqtt.simple import MQTTClient, MQTTException
-
-# Load login data from different file for safety reasons
-with open( 'privateInfo.json' ) as privateInfo:
-  secrets = ujson.loads( privateInfo.read() )
-
-# Set country to avoid possible errors / https://randomnerdtutorials.com/micropython-mqtt-esp32-esp8266/
-rp2.country( 'US' )
-
-
-def setup_wifi( ssid, password ):
-  wlan = network.WLAN( network.STA_IF )
-  wlan.active( True )
-  wlan.config( pm = 0xa11140 )  # Disable power-save mode
-  wlan.connect( ssid, password )
-
-  max_wait = 10
-  while max_wait > 0:
-    if wlan.status() < 0 or wlan.status() >= 3:
-      break
-  max_wait -= 1
-  print( 'waiting for connection...' )
-  utime.sleep( 1 )
-
-  # Status codes
-  # 0  Link Down
-  # 1  Link Join
-  # 2  Link NoIp
-  # 3  Link Up
-  # -1 Link Fail
-  # -2 Link NoNet
-  # -3 Link BadAuth
-  if wlan.status() != 3:
-    print( f"Wi-Fi error! Connection code: {wlan.status()}" )
-    raise RuntimeError( "Wi-Fi connection failed" )
-  else:
-    for i in range( wlan.status() ):
-      led.on()
-      time.sleep( .1 )
-      led.off()
-    print( "Connected" )
-    status = wlan.ifconfig()
-    print( f"IP address: {status[0]}" )
-
-
-client_id = secrets['client_id']
-wifi_ssid = secrets['ssid']
-wifi_password = secrets['pass']
-broker = secrets['broker']
-sub_topic = secrets['subTopic']
-pub_topic = secrets['pubTopic']
 
 last_message = 0
 message_interval = 60
@@ -155,7 +104,7 @@ if __name__ == "__main__":
   pressure_list = [0, 0, 0]
   led = machine.Pin( "LED", machine.Pin.OUT )
 
-  setup_wifi( wifi_ssid, wifi_password )
+  PicoW_WiFi.setup_wifi( wifi_ssid, wifi_password )
 
   # Get Sea Level Pressure from a local airport.  It is indicated by the SLP### reading.
   # Salt Lake City airport: https://e6bx.com/weather/KSLC/

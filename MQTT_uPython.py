@@ -3,30 +3,8 @@ import ubinascii
 import ujson
 import utime
 
+import PicoW_WiFi
 from umqtt.simple import MQTTClient
-
-
-def setup_wifi( ssid, password ):
-  wlan = network.WLAN( network.STA_IF )
-  wlan.active( True )
-  wlan.config( pm = 0xa11140 )  # Disable power-save mode
-  wlan.connect( ssid, password )
-
-  max_wait = 10
-  while max_wait > 0:
-    if wlan.status() < 0 or wlan.status() >= 3:
-      break
-  max_wait -= 1
-  print( 'waiting for connection...' )
-  utime.sleep( 1 )
-
-  # Handle connection error
-  if wlan.status() != 3:
-    raise RuntimeError( 'wifi connection failed' )
-  else:
-    print( 'connected' )
-  status = wlan.ifconfig()
-  print( 'ip = ' + status[0] )
 
 
 def connect_mqtt():
@@ -60,7 +38,7 @@ if __name__ == "__main__":
   client_id = secrets['client_id']
   publish_topic = secrets['pubTopic']
 
-  setup_wifi( wifi_ssid, wifi_password )
+  PicoW_WiFi.setup_wifi( wifi_ssid, wifi_password )
   mqtt_client = connect_mqtt()
 
   loop_count = 1
