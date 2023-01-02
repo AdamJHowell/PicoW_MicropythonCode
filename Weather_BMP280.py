@@ -19,9 +19,9 @@ import ujson
 import utime
 from machine import Pin, I2C
 
-from uPython_BMP280 import BMP280, BMP280_CASE_INDOOR
-from uPython_BMP280 import BMP280_POWER_NORMAL, BMP280_OS_HIGH, BMP280_TEMP_OS_8
-from uPython_BMP280 import BMP280_TEMP_OS_4, BMP280_STANDBY_250, BMP280_IIR_FILTER_2
+from bmp280.BMP280_uPython_Library import BMP280, BMP280_CASE_INDOOR
+from bmp280.BMP280_uPython_Library import BMP280_POWER_NORMAL, BMP280_OS_HIGH, BMP280_TEMP_OS_8
+from bmp280.BMP280_uPython_Library import BMP280_TEMP_OS_4, BMP280_STANDBY_250, BMP280_IIR_FILTER_2
 from umqtt.simple import MQTTClient, MQTTException
 
 # Load login data from different file for safety reasons

@@ -1,9 +1,9 @@
 from machine import Pin, I2C
-from uPython_BMP280 import BMP280, BMP280_CASE_INDOOR
-from uPython_BMP280 import BMP280_POWER_NORMAL, BMP280_OS_HIGH, BMP280_TEMP_OS_8
-from uPython_BMP280 import BMP280_TEMP_OS_4, BMP280_STANDBY_250, BMP280_IIR_FILTER_2
+from bmp280.BMP280_uPython_Library import BMP280, BMP280_CASE_INDOOR
+from bmp280.BMP280_uPython_Library import BMP280_POWER_NORMAL, BMP280_OS_HIGH, BMP280_TEMP_OS_8
+from bmp280.BMP280_uPython_Library import BMP280_TEMP_OS_4, BMP280_STANDBY_250, BMP280_IIR_FILTER_2
 import time
-import SHT20_uPython
+from sht20 import SHT20_uPython_Library
 from time import sleep_ms
 
 
