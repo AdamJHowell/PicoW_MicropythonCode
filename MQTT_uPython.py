@@ -1,3 +1,4 @@
+import machine
 import network
 import ubinascii
 import ujson
@@ -15,6 +16,23 @@ def connect_mqtt():
                            ssl = False )
   new_client.connect()
   return new_client
+
+
+def subscribe_callback( topic, msg ):
+  led = machine.Pin( "LED", machine.Pin.OUT )
+  print( (topic, msg) )
+  if msg == b'LEDon':
+    print( f"Device received LEDon message on topic {topic}" )
+    led.value( 1 )
+  if msg == b'LEDoff':
+    print( f"Device received LEDoff message on topic {topic}" )
+    led.value( 0 )
+
+
+def mqtt_subscribe( client, topic ):
+  client.set_callback( subscribe_callback )
+  client.subscribe( topic )
+  print( f"Subscribed to topic {topic}" )
 
 
 def publish( client, topic, value ):
