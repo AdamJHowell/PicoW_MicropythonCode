@@ -19,10 +19,14 @@ def add_value( input_list, value ):
 
 
 def average_list( input_list ):
-  statistics.mean( input_list )
+  sum( input_list ) / len( input_list )
 
 
 def restart_and_reconnect():
   print( "Failed to connect to MQTT broker. Restarting..." )
   time.sleep( 10 )
   machine.reset()
+
+
+def c_to_f( temp_c ):
+  return (temp_c * 1.8) + 32
