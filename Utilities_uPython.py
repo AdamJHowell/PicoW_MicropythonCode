@@ -1,5 +1,5 @@
-import statistics
 import time
+
 import machine
 
 
@@ -19,7 +19,7 @@ def add_value( input_list, value ):
 
 
 def average_list( input_list ):
-  sum( input_list ) / len( input_list )
+  return sum( input_list ) / len( input_list )
 
 
 def restart_and_reconnect():
