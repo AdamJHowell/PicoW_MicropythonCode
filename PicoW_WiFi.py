@@ -3,11 +3,11 @@ import machine
 import utime
 
 
-def setup_wifi( ssid, password ):
+def setup_wifi( wifi_ssid, wifi_password ):
   wlan = network.WLAN( network.STA_IF )
   wlan.active( True )
   wlan.config( pm = 0xa11140 )  # Disable power-save mode
-  wlan.connect( ssid, password )
+  wlan.connect( wifi_ssid, wifi_password )
 
   max_wait = 10
   while max_wait > 0:
@@ -41,3 +41,8 @@ def setup_wifi( ssid, password ):
 
 if __name__ == "__main__":
   print( "Setting up Wi-Fi" )
+  ssid = "faircom"
+  ssid2 = "Red5"
+  password = "6faircom3global0operations0"
+  password2 = "8012254722"
+  setup_wifi( ssid, password )
