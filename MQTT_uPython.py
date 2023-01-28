@@ -56,7 +56,7 @@ if __name__ == "__main__":
   client_id = secrets['client_id']
   publish_topic = secrets['pubTopic']
 
-  PicoW_WiFi.setup_wifi( wifi_ssid, wifi_password )
+  PicoW_WiFi.wifi_connect( wifi_ssid, wifi_password )
   mqtt_client = connect_mqtt()
 
   loop_count = 1

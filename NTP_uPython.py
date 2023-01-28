@@ -47,7 +47,7 @@ if __name__ == "__main__":
   ntp_host = "pool.ntp.org"
   led = Pin( "LED", Pin.OUT )
 
-  PicoW_WiFi.setup_wifi( wifi_ssid, wifi_password )
+  PicoW_WiFi.wifi_connect( wifi_ssid, wifi_password )
 
   led.on()
   print( f"Local time before: {time.localtime()}" )

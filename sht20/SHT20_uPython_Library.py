@@ -47,5 +47,7 @@ if __name__ == "__main__":
       print( f"SHT20 Fahrenheit: {temp_f:.2f} F" )
       print( f"SHT20 humidity: {humidity:.2f} %" )
       print( f"Loop count: {loop_count}" )
+      print( f"Next reading in {sensor_poll_interval} seconds" )
       print( "" )
+      last_sensor_poll = time.time()
       sleep_ms( 15 )
